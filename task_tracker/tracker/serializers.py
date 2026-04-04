@@ -11,6 +11,12 @@ class RegisterSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
     email = serializers.EmailField()
 
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'created_at')
+        read_only_fields = ('created_at',)
+
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task

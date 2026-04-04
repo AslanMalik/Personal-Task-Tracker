@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from .models import Task, TaskComment, Category, User
-from .serializers import LoginSerializer, RegisterSerializer, TaskSerializer, TaskCommentSerializer
+from .serializers import LoginSerializer, RegisterSerializer, TaskSerializer, TaskCommentSerializer, CategorySerializer
 
 
 
@@ -113,4 +113,73 @@ class TaskDetailView(APIView):
 
         task.delete()
         return Response(status=204)
+
+
+class CategoryListCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        categories = Category.objects.all()
+        serializer = CategorySerializer(categories, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+
+class CategoryDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, pk):
+        try:
+            return Category.objects.get(pk=pk)
+        except Category.DoesNotExist:
+            return None
+
+    def get(self, request, pk):
+        category = self.get_object(pk)
+        if not category:
+            return Response({'error': 'Not found'}, status=404)
+        return Response(CategorySerializer(category).data)
+
+    def put(self, request, pk):
+        category = self.get_object(pk)
+        if not category:
+            return Response({'error': 'Not found'}, status=404)
+        serializer = CategorySerializer(category, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        category = self.get_object(pk)
+        if not category:
+            return Response({'error': 'Not found'}, status=404)
+        category.delete()
+        return Response(status=204)
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def task_comments_view(request, pk):
+    try:
+        task = Task.objects.get(pk=pk, user=request.user)
+    except Task.DoesNotExist:
+        return Response({'error': 'Task not found'}, status=404)
+
+    if request.method == 'GET':
+        comments = task.comments.all()
+        serializer = TaskCommentSerializer(comments, many=True)
+        return Response(serializer.data)
+
+    serializer = TaskCommentSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(task=task, user=request.user)
+        return Response(serializer.data, status=201)
+    return Response(serializer.errors, status=400)
 
