@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+.task-page {
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #eef1f4 0%, #fdf5d7 100%);
+  padding: 60px 20px;
+  color: #1a1a1a;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 40px;
+}
+
+.header h1 {
+  font-size: 36px;
+  margin: 0;
+}
+
+.header p {
+  color: #7a7a7a;
+}
+
+.create-card {
+  background: #ffffff;
+  padding: 12px 12px 12px 24px;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  margin-bottom: 40px;
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.create-card input {
+  flex: 2;
+  border: none;
+  outline: none;
+  font-size: 16px;
+}
+
+.create-card select {
+  border: 1px solid #f0f0f0;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 12px;
+  outline: none;
+}
+
+.create-card button {
+  background: #fbd652;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.task-card {
+  background: #fff;
+  border-radius: 28px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.status-indicator {
+  position: absolute;
+  left: 0;
+  top: 20px;
+  bottom: 20px;
+  width: 5px;
+  border-radius: 0 4px 4px 0;
+}
+
+.status-indicator[data-status="todo"] {
+  background: #d1d1d1;
+}
+
+.status-indicator[data-status="in_progress"] {
+  background: #fbd652;
+}
+
+.status-indicator[data-status="done"] {
+  background: #2ecc71;
+}
+
+.task-content {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.task-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.category-badge {
+  background: #f0f2f5;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.actions select {
+  border: 1px solid #eee;
+  padding: 8px;
+  border-radius: 10px;
+}
+
+.task-card.done {
+  opacity: 0.6;
+}
+
+/* .task-card.done h3 {
+  text-decoration: line-through;
+} */
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #ff4757;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}

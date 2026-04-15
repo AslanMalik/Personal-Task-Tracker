@@ -1,0 +1,15 @@
+<header class="main-header">
+  <div class="header-container">
+    <div class="logo" routerLink="/dashboard">{{ projectName }}</div>
+    
+    <nav class="nav-links">
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
+      <a routerLink="/profile" routerLinkActive="active">Profile</a>
+    </nav>
+
+    <div class="user-actions">
+      <button class="logout-btn" routerLink="/login">Exit</button>
+    </div>
+  </div>
+</header>

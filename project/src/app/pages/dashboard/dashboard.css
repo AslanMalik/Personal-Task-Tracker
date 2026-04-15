@@ -1,0 +1,129 @@
+.dashboard-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #eef1f4 0%, #fdf5d7 100%);
+  padding: 80px 20px;
+  font-family: 'Inter', sans-serif;
+  color: #1a1a1a;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  max-width: 900px;
+  width: 100%;
+}
+
+.header {
+  margin-bottom: 50px;
+}
+
+.header h1 {
+  font-size: 46px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  letter-spacing: -1px;
+}
+
+.header p {
+  font-size: 20px;
+  color: #666;
+  margin: 0;
+}
+
+/* Сетка для карточек статистики */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 60px;
+}
+
+/* Общий стиль карточки */
+.stat-card {
+  padding: 30px 24px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-card h2 {
+  font-size: 54px;
+  margin: 0;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat-card p {
+  margin: 12px 0 24px 0;
+  font-size: 16px;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+/* Полоса прогресса */
+.progress-bar {
+  height: 6px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+  margin-top: auto;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); /* Плавная анимация загрузки */
+}
+
+/* Цветовые вариации карточек (как на референсе) */
+.dark {
+  background: #1e1e1e;
+  color: #ffffff;
+}
+.dark .progress-bar { background: rgba(255,255,255,0.2); }
+.dark .fill { background: #fbd652; }
+
+.yellow {
+  background: #e8c444; 
+  color: #1a1a1a;
+}
+.yellow .progress-bar { background: rgba(0,0,0,0.15); }
+.yellow .dark-fill { background: #1e1e1e; }
+
+.light {
+  background: #ffffff;
+  color: #1a1a1a;
+}
+.light .progress-bar { background: #f0f0f0; }
+.light .dark-fill { background: #1e1e1e; }
+
+/* Кнопка перехода */
+.actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.btn-primary {
+  background: #1e1e1e;
+  color: #fff;
+  text-decoration: none;
+  padding: 18px 36px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 18px;
+  transition: all 0.2s ease;
+  display: inline-block;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+  background: #000;
+}

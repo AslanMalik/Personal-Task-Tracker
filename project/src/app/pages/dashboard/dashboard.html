@@ -1,0 +1,44 @@
+<div class="dashboard-page">
+  <div class="container">
+    <header class="header">
+      <h1>Hello, {{ username() }}!</h1>
+      <p>What are your tasks for today?</p>
+    </header>
+
+    <div class="stats-grid">
+      <div class="stat-card dark">
+        <h2>{{ totalTasks() }}</h2>
+        <p>Total tasks</p>
+        <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+      </div>
+
+      <div class="stat-card yellow">
+        <h2>{{ completedTasks() }}</h2>
+        <p>Completed</p>
+        <div class="progress-bar">
+          <div class="fill dark-fill" [style.width.%]="totalTasks() ? (completedTasks() / totalTasks()) * 100 : 0"></div>
+        </div>
+      </div>
+
+      <div class="stat-card light">
+        <h2>{{ inProgressTasks() }}</h2>
+        <p>In progress</p>
+        <div class="progress-bar">
+          <div class="fill dark-fill" [style.width.%]="totalTasks() ? (inProgressTasks() / totalTasks()) * 100 : 0"></div>
+        </div>
+      </div>
+
+      <div class="stat-card light">
+        <h2>{{ todoTasks() }}</h2>
+        <p>Upcoming / To Do</p>
+        <div class="progress-bar">
+          <div class="fill dark-fill" [style.width.%]="totalTasks() ? (todoTasks() / totalTasks()) * 100 : 0"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <a routerLink="/tasks" class="btn-primary">Go to Workspace ▶</a>
+    </div>
+  </div>
+</div>
