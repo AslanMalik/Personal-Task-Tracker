@@ -12,26 +12,26 @@ import { Task } from '../../models/task';
   styleUrls: ['./tasks.css']
 })
 export class Tasks implements OnInit {
-  newTask: Partial<Task> = {
+
+  // newTask теперь сигнал — Angular реактивно отслеживает изменения
+  newTask = signal<Partial<Task>>({
     title: '',
     category: undefined,
     status: 'todo',
     description: '',
     deadline: null
-  };
+  });
 
   showCalendar = signal(false);
   calendarDate = signal(new Date());
 
-  // Calendar grid
   get calendarDays(): (Date | null)[] {
     const d = this.calendarDate();
     const year = d.getFullYear();
     const month = d.getMonth();
-    const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+    const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const days: (Date | null)[] = [];
-    // offset for Mon start
     const offset = (firstDay === 0 ? 6 : firstDay - 1);
     for (let i = 0; i < offset; i++) days.push(null);
     for (let i = 1; i <= daysInMonth; i++) days.push(new Date(year, month, i));
@@ -50,6 +50,25 @@ export class Tasks implements OnInit {
 
   ngOnInit() {
     this.taskService.loadInitialData();
+  }
+
+  // Геттеры для двустороннего биндинга с ngModel
+  get title() { return this.newTask().title ?? ''; }
+  set title(v: string) { this.newTask.update(t => ({ ...t, title: v })); }
+
+  get description() { return this.newTask().description ?? ''; }
+  set description(v: string) { this.newTask.update(t => ({ ...t, description: v })); }
+
+  get category() { return this.newTask().category; }
+  set category(v: any) { this.newTask.update(t => ({ ...t, category: v })); }
+
+  get deadlineLabel(): string {
+    const dl = this.newTask().deadline;
+    if (!dl) return 'Set deadline';
+    return new Date(dl).toLocaleString('en', {
+      weekday: 'short', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
   }
 
   openCalendar() {
@@ -84,7 +103,7 @@ export class Tasks implements OnInit {
 
   isPast(day: Date | null): boolean {
     if (!day) return false;
-    const today = new Date(); today.setHours(0,0,0,0);
+    const today = new Date(); today.setHours(0, 0, 0, 0);
     return day < today;
   }
 
@@ -92,29 +111,19 @@ export class Tasks implements OnInit {
     if (!this.selectedDeadlineDate) return;
     const d = new Date(this.selectedDeadlineDate);
     d.setHours(Number(this.deadlineHour), Number(this.deadlineMinute), 0, 0);
-    this.newTask.deadline = d.toISOString();
+    this.newTask.update(t => ({ ...t, deadline: d.toISOString() }));
     this.showCalendar.set(false);
   }
 
   clearDeadline() {
-    this.newTask.deadline = null;
+    this.newTask.update(t => ({ ...t, deadline: null }));
     this.selectedDeadlineDate = null;
     this.showCalendar.set(false);
   }
 
-  get deadlineLabel(): string {
-    if (!this.newTask.deadline) return 'Set deadline';
-    const d = new Date(this.newTask.deadline);
-    return d.toLocaleString('en', {
-      weekday: 'short', month: 'short', day: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
-  }
-
   getTaskDeadlineLabel(deadline: string | null | undefined): string {
     if (!deadline) return '';
-    const d = new Date(deadline);
-    return d.toLocaleString('en', {
+    return new Date(deadline).toLocaleString('en', {
       weekday: 'short', month: 'short', day: 'numeric',
       hour: '2-digit', minute: '2-digit'
     });
@@ -123,7 +132,7 @@ export class Tasks implements OnInit {
   isDeadlineUrgent(deadline: string | null | undefined): boolean {
     if (!deadline) return false;
     const diff = new Date(deadline).getTime() - Date.now();
-    return diff > 0 && diff < 24 * 60 * 60 * 1000; // less than 24h
+    return diff > 0 && diff < 24 * 60 * 60 * 1000;
   }
 
   isDeadlineOverdue(deadline: string | null | undefined): boolean {
@@ -132,10 +141,10 @@ export class Tasks implements OnInit {
   }
 
   createTask() {
-    if (!this.newTask.title?.trim()) return;
-    this.taskService.addTask(this.newTask).subscribe({
+    if (!this.newTask().title?.trim()) return;
+    this.taskService.addTask(this.newTask()).subscribe({
       next: () => {
-        this.newTask = { title: '', category: undefined, status: 'todo', description: '', deadline: null };
+        this.newTask.set({ title: '', category: undefined, status: 'todo', description: '', deadline: null });
         this.selectedDeadlineDate = null;
         this.showCalendar.set(false);
       },

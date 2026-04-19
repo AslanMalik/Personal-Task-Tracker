@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Task, Category, TaskStatus } from '../models/task';
 import { Observable, tap } from 'rxjs';
 
@@ -10,63 +10,32 @@ export class TaskService {
   tasks = signal<Task[]>([]);
   categories = signal<Category[]>([]);
 
-  constructor(private http: HttpClient) { }
-
-  private getHeaders() {
-    const token = localStorage.getItem('access');
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-  }
+  constructor(private http: HttpClient) {}
 
   loadInitialData() {
-    const headers = this.getHeaders();
-    this.http.get<Category[]>(`${this.apiUrl}/categories/`, { headers })
+    this.http.get<Category[]>(`${this.apiUrl}/categories/`)
       .subscribe(data => this.categories.set(data));
 
-    this.http.get<Task[]>(`${this.apiUrl}/tasks/`, { headers })
+    this.http.get<Task[]>(`${this.apiUrl}/tasks/`)
       .subscribe(data => this.tasks.set(data));
   }
 
   addTask(task: Partial<Task>): Observable<Task> {
-    const headers = this.getHeaders();
-    return this.http.post<Task>(`${this.apiUrl}/tasks/`, task, { headers }).pipe(
-      tap(newTask => {
-        this.tasks.update(prev => [newTask, ...prev]);
-      })
+    return this.http.post<Task>(`${this.apiUrl}/tasks/`, task).pipe(
+      tap(newTask => this.tasks.update(prev => [newTask, ...prev]))
     );
   }
 
-  // updateTaskStatus(taskId: number, status: TaskStatus): Observable<Task> {
-  //   const headers = this.getHeaders();
-  //   return this.http.patch<Task>(`${this.apiUrl}/tasks/${taskId}/`, { status }, { headers }).pipe(
-  //     tap(updated => {
-  //       this.tasks.update(prev => prev.map(t => t.id === taskId ? updated : t));
-  //     })
-  //   );
-  // }
-
   updateTaskStatus(task: Task, newStatus: TaskStatus): Observable<Task> {
-    const headers = this.getHeaders();
-
-    const payload = {
-      ...task,
-      status: newStatus
-    };
-
-    return this.http.put<Task>(`${this.apiUrl}/tasks/${task.id}/`, payload, { headers }).pipe(
-      tap(updated => {
-        this.tasks.update(prev => prev.map(t => t.id === task.id ? updated : t));
-      })
+    const payload = { ...task, status: newStatus };
+    return this.http.put<Task>(`${this.apiUrl}/tasks/${task.id}/`, payload).pipe(
+      tap(updated => this.tasks.update(prev => prev.map(t => t.id === task.id ? updated : t)))
     );
   }
 
   deleteTask(taskId: number): Observable<any> {
-    const headers = this.getHeaders();
-    return this.http.delete(`${this.apiUrl}/tasks/${taskId}/`, { headers }).pipe(
-      tap(() => {
-        this.tasks.update(prev => prev.filter(t => t.id !== taskId));
-      })
+    return this.http.delete(`${this.apiUrl}/tasks/${taskId}/`).pipe(
+      tap(() => this.tasks.update(prev => prev.filter(t => t.id !== taskId)))
     );
   }
 }
