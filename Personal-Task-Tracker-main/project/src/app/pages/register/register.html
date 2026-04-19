@@ -1,0 +1,28 @@
+<div class="auth-page">
+    <div class="auth-card">
+        <h2>Register</h2>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="text" [(ngModel)]="email" id="email" />
+        </div>
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" [(ngModel)]="username" id="username" />
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" [(ngModel)]="password" id="password" />
+        </div>
+
+        <button (click)="register()">Register</button>
+
+        @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+        }
+
+        <p>Already have an account? <a routerLink="/login">Login</a></p>
+    </div>
+</div>

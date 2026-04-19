@@ -1,0 +1,50 @@
+<div class="profile-page">
+  <div class="container">
+    <header class="header">
+      <h1>My Profile</h1>
+      <p>Manage your account and view activity</p>
+    </header>
+
+    <div class="profile-grid">
+      <div class="card info-card">
+        <div class="avatar">
+          {{ username().charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-details">
+          <h2>{{ username() }}</h2>
+          <p class="email">{{ email() }}</p>
+          <span class="badge">Active Member</span>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="card stat-box dark">
+          <span class="label">Total Tasks</span>
+          <span class="value">{{ totalTasks() }}</span>
+        </div>
+        <div class="card stat-box yellow">
+          <span class="label">Completed</span>
+          <span class="value">{{ completedTasks() }}</span>
+        </div>
+      </div>
+
+      <div class="card actions-card">
+        <h3>Account Settings</h3>
+        <div class="action-list">
+          <button class="action-item">
+            <span>Edit Profile</span>
+            <i class="arrow">▶</i>
+          </button>
+          <button class="action-item">
+            <span>Change Password</span>
+            <i class="arrow">▶</i>
+          </button>
+          <button class="action-item logout-trigger" (click)="logout()">
+            <span>Logout from account</span>
+            <i class="arrow">▶</i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

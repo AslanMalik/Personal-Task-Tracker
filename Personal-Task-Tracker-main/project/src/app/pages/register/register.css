@@ -1,0 +1,135 @@
+/* Подключаем современный шрифт, похожий на тот, что в референсе */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* Полезно, чтобы фон растягивался на весь экран */
+}
+
+/* Базовые стили страницы */
+.auth-page {
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Мягкий градиентный фон, как на изображении (переход от серого к теплому желтому) */
+  background: linear-gradient(135deg, #e8e9eb 0%, #fef3d5 100%);
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Стили карточки авторизации */
+.auth-card {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 400px;
+  padding: 40px;
+  /* Большие скругления, характерные для этого дизайна */
+  border-radius: 32px;
+  /* Мягкая тень для объема */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+  text-align: center;
+}
+
+.auth-card h2 {
+  margin-top: 0;
+  margin-bottom: 30px;
+  color: #1a1a1a;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+/* Группы полей ввода */
+.form-group {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #666666;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 14px 16px;
+  /* Мягкие скругления полей ввода */
+  border-radius: 16px;
+  border: 1px solid #e0e0e0;
+  background-color: #fcfcfc;
+  font-size: 15px;
+  font-family: inherit;
+  color: #1a1a1a;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  /* Акцентный цвет при фокусе (взят с желтых элементов интерфейса) */
+  border-color: #fbd652;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(251, 214, 82, 0.15);
+}
+
+/* Кнопка */
+.auth-card button {
+  width: 100%;
+  padding: 16px;
+  margin-top: 10px;
+  /* Темная кнопка, как активный таб "Dashboard" в референсе */
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border: none;
+  /* Овальная кнопка (pill-shape) */
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  font-family: inherit;
+}
+
+.auth-card button:hover {
+  background-color: #333333;
+  transform: translateY(-1px);
+}
+
+.auth-card button:active {
+  transform: translateY(1px);
+}
+
+/* Сообщение об ошибке */
+.error-message {
+  color: #ff4d4f;
+  font-size: 14px;
+  margin-top: 15px;
+  background-color: #fff2f0;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+/* Ссылка на регистрацию */
+.auth-card p:last-child {
+  margin-top: 25px;
+  font-size: 14px;
+  color: #666666;
+}
+
+.auth-card a {
+  color: #1a1a1a;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.auth-card a:hover {
+  /* При наведении ссылка подсвечивается фирменным желтым */
+  color: #e5b914; 
+}

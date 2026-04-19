@@ -1,0 +1,110 @@
+<div class="task-page">
+  <div class="container">
+    <header class="header">
+      <h1>My Workspace</h1>
+      <p>Manage your tasks and categories</p>
+    </header>
+
+    <div class="create-card">
+      <div class="input-row">
+        <input type="text" [(ngModel)]="newTask.title" placeholder="Task title (required)" style="flex: 2;"/>
+        <select [(ngModel)]="newTask.category" style="flex: 1;">
+          <option [ngValue]="undefined">No Category</option>
+          @for (cat of taskService.categories(); track cat.id) {
+            <option [ngValue]="cat.id">{{ cat.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="input-row" style="margin-top: 15px;">
+        <input type="text" [(ngModel)]="newTask.description" placeholder="Task description (optional)..." style="flex: 3;"/>
+        <button class="deadline-btn" (click)="openCalendar()" [class.has-deadline]="newTask.deadline">
+          📅 {{ deadlineLabel }}
+        </button>
+        <button (click)="createTask()" [disabled]="!newTask.title">Add Task</button>
+      </div>
+
+      <!-- CALENDAR POPUP -->
+      @if (showCalendar()) {
+        <div class="calendar-popup">
+          <div class="cal-header">
+            <button class="cal-nav" (click)="prevMonth()">‹</button>
+            <span class="cal-month">{{ calendarMonthLabel }}</span>
+            <button class="cal-nav" (click)="nextMonth()">›</button>
+          </div>
+
+          <div class="cal-grid">
+            <div class="cal-weekday" *ngFor="let d of ['Mo','Tu','We','Th','Fr','Sa','Su']">{{ d }}</div>
+            @for (day of calendarDays; track $index) {
+              <div
+                class="cal-day"
+                [class.empty]="!day"
+                [class.today]="isToday(day)"
+                [class.selected]="isSelectedDay(day)"
+                [class.past]="isPast(day)"
+                (click)="selectDay(day)">
+                {{ day ? day.getDate() : '' }}
+              </div>
+            }
+          </div>
+
+          <div class="cal-time">
+            <span>Time:</span>
+            <input type="number" [(ngModel)]="deadlineHour" min="0" max="23" class="time-input"/> :
+            <input type="number" [(ngModel)]="deadlineMinute" min="0" max="59" class="time-input"/>
+          </div>
+
+          <div class="cal-actions">
+            <button class="cal-clear" (click)="clearDeadline()">Clear</button>
+            <button class="cal-confirm" (click)="confirmDeadline()" [disabled]="!selectedDeadlineDate">Confirm</button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="task-list">
+      @for (task of taskService.tasks(); track task.id) {
+        <div class="task-card" [class.done]="task.status === 'done'"
+             [class.overdue]="isDeadlineOverdue(task.deadline)"
+             [class.urgent]="isDeadlineUrgent(task.deadline)">
+          <div class="status-indicator" [attr.data-status]="task.status"></div>
+
+          <div class="task-content">
+            <div class="task-header">
+              <h3>{{ task.title }}</h3>
+              @if (task.category) {
+                <span class="category-badge">{{ getCategoryName(task.category) }}</span>
+              }
+            </div>
+            <p class="description">{{ task.description || 'No description provided' }}</p>
+
+            @if (task.deadline) {
+              <div class="deadline-badge"
+                   [class.overdue]="isDeadlineOverdue(task.deadline)"
+                   [class.urgent]="isDeadlineUrgent(task.deadline)">
+                @if (isDeadlineOverdue(task.deadline)) {
+                  ⚠️ Overdue · {{ getTaskDeadlineLabel(task.deadline) }}
+                } @else if (isDeadlineUrgent(task.deadline)) {
+                  🔥 Due soon · {{ getTaskDeadlineLabel(task.deadline) }}
+                } @else {
+                  📅 {{ getTaskDeadlineLabel(task.deadline) }}
+                }
+              </div>
+            }
+          </div>
+
+          <div class="actions" style="display: flex; gap: 10px; align-items: center;">
+            <select [ngModel]="task.status" (ngModelChange)="changeStatus(task, $event)">
+              <option value="todo">To Do</option>
+              <option value="in_progress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+            <button class="delete-btn" (click)="deleteTask(task.id!)">Delete</button>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">No tasks found. Add one above!</div>
+      }
+    </div>
+  </div>
+</div>

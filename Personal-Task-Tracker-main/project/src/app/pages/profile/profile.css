@@ -1,0 +1,110 @@
+.profile-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #eef1f4 0%, #fdf5d7 100%);
+  padding: 60px 20px;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  max-width: 800px;
+  width: 100%;
+}
+
+.header { margin-bottom: 40px; }
+.header h1 { font-size: 38px; margin: 0; font-weight: 700; letter-spacing: -1px; }
+.header p { color: #666; font-size: 18px; margin-top: 8px; }
+
+.profile-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card {
+  background: white;
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+}
+
+/* Карточка информации */
+.info-card {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  background: #1e1e1e;
+  color: #fbd652;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  font-weight: 700;
+}
+
+.user-details h2 { margin: 0; font-size: 28px; }
+.email { color: #666; margin: 5px 0 15px 0; }
+.badge {
+  background: #fdf5d7;
+  color: #c4a000;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Ряд статистики */
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.stat-box.dark { background: #1e1e1e; color: white; }
+.stat-box.yellow { background: #fbd652; color: #1e1e1e; }
+
+.label { font-size: 14px; opacity: 0.8; margin-bottom: 5px; }
+.value { font-size: 32px; font-weight: 700; }
+
+/* Список действий */
+.actions-card h3 { margin-bottom: 20px; font-size: 20px; }
+
+.action-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #1a1a1a;
+  transition: padding-left 0.2s;
+}
+
+.action-item:last-child { border-bottom: none; }
+.action-item:hover { padding-left: 10px; color: #000; }
+
+.logout-trigger { color: #ff4757; }
+.logout-trigger:hover { color: #ff2e44; }
+
+.arrow { font-style: normal; font-weight: 700; opacity: 0.3; }

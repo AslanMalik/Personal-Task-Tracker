@@ -1,0 +1,115 @@
+<section class="stats-page">
+  <div class="stats-header">
+    <h1>Statistics</h1>
+    <p class="subtitle">Your task completion overview</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <span>Loading your stats...</span>
+    </div>
+  } @else if (error()) {
+    <div class="error-msg">{{ error() }}</div>
+  } @else {
+    <div class="charts-grid">
+
+      <!-- TODAY -->
+      <div class="chart-card" style="--accent: #6EE7B7; --accent2: #374151">
+        <div class="card-label">Today</div>
+        <div class="chart-wrap">
+          <svg viewBox="0 0 100 100" class="pie">
+            @if (dayStats().total === 0) {
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#2d3748" stroke-width="1.5"/>
+              <text x="50" y="54" text-anchor="middle" class="empty-text">No tasks</text>
+            } @else {
+              <circle cx="50" cy="50" r="40" fill="#374151"/>
+              <path [attr.d]="getDoneArc(dayStats())" fill="#6EE7B7" class="slice done-slice"/>
+              <path [attr.d]="getNotDoneArc(dayStats())" fill="#1F2937" class="slice"/>
+              <text x="50" y="47" text-anchor="middle" class="center-pct">
+                {{ getPercent(dayStats().done, dayStats().total) }}%
+              </text>
+              <text x="50" y="59" text-anchor="middle" class="center-label">done</text>
+            }
+          </svg>
+        </div>
+        <div class="legend">
+          <div class="legend-item">
+            <span class="dot done"></span>
+            <span>Done <strong>{{ dayStats().done }}</strong></span>
+          </div>
+          <div class="legend-item">
+            <span class="dot notdone"></span>
+            <span>Not done <strong>{{ dayStats().notDone }}</strong></span>
+          </div>
+          <div class="total-line">{{ dayStats().total }} total tasks</div>
+        </div>
+      </div>
+
+      <!-- THIS WEEK -->
+      <div class="chart-card" style="--accent: #93C5FD; --accent2: #1e3a5f">
+        <div class="card-label">This Week</div>
+        <div class="chart-wrap">
+          <svg viewBox="0 0 100 100" class="pie">
+            @if (weekStats().total === 0) {
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#2d3748" stroke-width="1.5"/>
+              <text x="50" y="54" text-anchor="middle" class="empty-text">No tasks</text>
+            } @else {
+              <circle cx="50" cy="50" r="40" fill="#1e3a5f"/>
+              <path [attr.d]="getDoneArc(weekStats())" fill="#93C5FD" class="slice done-slice"/>
+              <path [attr.d]="getNotDoneArc(weekStats())" fill="#0f172a" class="slice"/>
+              <text x="50" y="47" text-anchor="middle" class="center-pct">
+                {{ getPercent(weekStats().done, weekStats().total) }}%
+              </text>
+              <text x="50" y="59" text-anchor="middle" class="center-label">done</text>
+            }
+          </svg>
+        </div>
+        <div class="legend">
+          <div class="legend-item">
+            <span class="dot" style="background: #93C5FD"></span>
+            <span>Done <strong>{{ weekStats().done }}</strong></span>
+          </div>
+          <div class="legend-item">
+            <span class="dot notdone"></span>
+            <span>Not done <strong>{{ weekStats().notDone }}</strong></span>
+          </div>
+          <div class="total-line">{{ weekStats().total }} total tasks</div>
+        </div>
+      </div>
+
+      <!-- THIS MONTH -->
+      <div class="chart-card" style="--accent: #F9A8D4; --accent2: #4a1942">
+        <div class="card-label">This Month</div>
+        <div class="chart-wrap">
+          <svg viewBox="0 0 100 100" class="pie">
+            @if (monthStats().total === 0) {
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#2d3748" stroke-width="1.5"/>
+              <text x="50" y="54" text-anchor="middle" class="empty-text">No tasks</text>
+            } @else {
+              <circle cx="50" cy="50" r="40" fill="#4a1942"/>
+              <path [attr.d]="getDoneArc(monthStats())" fill="#F9A8D4" class="slice done-slice"/>
+              <path [attr.d]="getNotDoneArc(monthStats())" fill="#1a0a1a" class="slice"/>
+              <text x="50" y="47" text-anchor="middle" class="center-pct">
+                {{ getPercent(monthStats().done, monthStats().total) }}%
+              </text>
+              <text x="50" y="59" text-anchor="middle" class="center-label">done</text>
+            }
+          </svg>
+        </div>
+        <div class="legend">
+          <div class="legend-item">
+            <span class="dot" style="background: #F9A8D4"></span>
+            <span>Done <strong>{{ monthStats().done }}</strong></span>
+          </div>
+          <div class="legend-item">
+            <span class="dot notdone"></span>
+            <span>Not done <strong>{{ monthStats().notDone }}</strong></span>
+          </div>
+          <div class="total-line">{{ monthStats().total }} total tasks</div>
+        </div>
+      </div>
+
+    </div>
+  }
+</section>
