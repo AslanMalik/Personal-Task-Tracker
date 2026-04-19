@@ -340,3 +340,32 @@
   color: #aaa;
   padding: 40px;
 }
+/* ── OVERDUE ALERT OVERLAY ── */
+.overdue-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: none;
+  animation: fadeInOut 3s ease forwards;
+}
+
+.overdue-gif {
+  width: 280px;
+  height: 280px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 30px rgba(255, 71, 87, 0.6));
+}
+
+@keyframes fadeInOut {
+  0%   { opacity: 0; transform: scale(0.7); }
+  15%  { opacity: 1; transform: scale(1.05); }
+  25%  { transform: scale(1); }
+  75%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(0.9); }
+}

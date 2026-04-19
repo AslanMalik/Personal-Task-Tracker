@@ -10,14 +10,18 @@ export class TaskService {
   tasks = signal<Task[]>([]);
   categories = signal<Category[]>([]);
 
-  constructor(private http: HttpClient) {}
+  constructor(public http: HttpClient) {}
+
+  loadTasks(): Observable<Task[]> {
+    return this.http.get<Task[]>(`${this.apiUrl}/tasks/`).pipe(
+      tap(data => this.tasks.set(data))
+    );
+  }
 
   loadInitialData() {
     this.http.get<Category[]>(`${this.apiUrl}/categories/`)
       .subscribe(data => this.categories.set(data));
-
-    this.http.get<Task[]>(`${this.apiUrl}/tasks/`)
-      .subscribe(data => this.tasks.set(data));
+    this.loadTasks().subscribe();
   }
 
   addTask(task: Partial<Task>): Observable<Task> {
