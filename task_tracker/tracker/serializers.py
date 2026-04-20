@@ -14,13 +14,13 @@ class RegisterSerializer(serializers.Serializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('id', 'name', 'created_at')
-        read_only_fields = ('created_at',)
+        fields = ('id', 'name', 'user', 'created_at')
+        read_only_fields = ('user', 'created_at',)
 
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ('id', 'title', 'description', 'status', 'category', 'created_at')
+        fields = ('id', 'title', 'description', 'status', 'category', 'deadline', 'created_at')
         read_only_fields = ('created_at', )
 
 class TaskCommentSerializer(serializers.ModelSerializer):

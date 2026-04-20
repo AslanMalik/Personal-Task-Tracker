@@ -18,8 +18,29 @@
       </div>
       
       <div class="input-row" style="margin-top: 15px;">
-        <input type="text" [(ngModel)]="newTask.description" (keyup.enter)="createTask()" placeholder="Task description (optional)..." style="flex: 3;"/>
+        <input type="text" [(ngModel)]="newTask.description" placeholder="Task description (optional)..." style="flex: 2;"/>
+        <input type="datetime-local" [(ngModel)]="newTask.deadline" style="flex: 1;"/>
         <button (click)="createTask()" [disabled]="!newTask.title">Add Task</button>
+      </div>
+    </div>
+
+    <div class="category-management">
+      <div class="section-title">
+        <h2>Categories</h2>
+        <div class="add-cat-row">
+          <input type="text" [(ngModel)]="newCategoryName" placeholder="New category name..." (keyup.enter)="createCategory()"/>
+          <button (click)="createCategory()" [disabled]="!newCategoryName.trim()">Add</button>
+        </div>
+      </div>
+      <div class="category-chips">
+        @for (cat of taskService.categories(); track cat.id) {
+          <div class="cat-chip">
+            {{ cat.name }}
+            @if (!!cat.user) {
+              <span class="delete-cat" (click)="deleteCategory(cat.id)">&times;</span>
+            }
+          </div>
+        }
       </div>
     </div>
 
@@ -32,7 +53,10 @@
             <div class="task-header">
               <h3>{{ task.title }}</h3>
               @if (task.category) {
-                <span class="category-badge">{{ getCategoryName(task.category) }}</span>
+                <span class="category-badge">{{ taskService.getCategoryName(task.category) }}</span>
+              }
+              @if (task.deadline) {
+                <span class="deadline-badge">📅 {{ task.deadline | date:'short' }}</span>
               }
             </div>
             <p class="description">{{ task.description || 'No description provided' }}</p>

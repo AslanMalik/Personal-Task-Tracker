@@ -1,0 +1,42 @@
+<div class="calendar-page">
+  <div class="container">
+    <header class="calendar-header">
+      <div class="header-content">
+        <h1>Task Calendar</h1>
+        <p>Plan your schedule and meet deadlines</p>
+      </div>
+      <div class="calendar-nav">
+        <button (click)="prevMonth()" class="nav-btn">&larr;</button>
+        <h2 class="current-month">{{ getMonthName() }}</h2>
+        <button (click)="nextMonth()" class="nav-btn">&rarr;</button>
+      </div>
+    </header>
+
+    <div class="calendar-card">
+      <div class="weekday-grid">
+        @for (day of weekDays; track day) {
+          <div class="weekday">{{ day }}</div>
+        }
+      </div>
+
+      <div class="days-grid">
+        @for (day of days(); track day.date) {
+          <div class="day-cell" 
+               [class.other-month]="!day.isCurrentMonth"
+               [class.today]="day.isToday">
+            <div class="day-number">{{ day.date.getDate() }}</div>
+            
+            <div class="task-indicators">
+              @for (task of day.tasks; track task.id) {
+                <div class="task-item" [attr.data-status]="task.status" [title]="task.title">
+                  <span class="task-dot"></span>
+                  <span class="task-title">{{ task.title }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

@@ -37,6 +37,85 @@
       </div>
     </div>
 
+    <div class="upcoming-section">
+      <div class="section-header">
+        <h2>Upcoming Deadlines</h2>
+        <p>Don't miss these important tasks</p>
+      </div>
+
+      <div class="upcoming-list">
+        @for (task of upcomingTasks(); track task.id) {
+          <div class="upcoming-item">
+            <div class="item-main">
+              <h3>{{ task.title }}</h3>
+              <span class="item-cat">{{ taskService.getCategoryName(task.category) }}</span>
+            </div>
+            <div class="item-date">
+              <span class="date-badge">{{ task.deadline | date:'MMM d, HH:mm' }}</span>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-upcoming">
+            <p>No upcoming deadlines. Great job!</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="analytics-section">
+      <div class="section-header">
+        <h2>Analytics</h2>
+        <p>Performance by time period</p>
+      </div>
+      
+      <div class="charts-grid">
+        <!-- Daily Chart -->
+        <div class="chart-card">
+          <div class="chart-container">
+            <svg viewBox="0 0 36 36" class="circular-chart chart-yellow">
+              <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path class="circle" [attr.stroke-dasharray]="dayStats().percent + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <text x="18" y="20.35" class="percentage">{{ dayStats().percent }}%</text>
+            </svg>
+          </div>
+          <div class="chart-info">
+            <h3>Today</h3>
+            <span>{{ dayStats().completed }}/{{ dayStats().total }} tasks</span>
+          </div>
+        </div>
+
+        <!-- Weekly Chart -->
+        <div class="chart-card">
+          <div class="chart-container">
+            <svg viewBox="0 0 36 36" class="circular-chart chart-dark">
+              <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path class="circle" [attr.stroke-dasharray]="weekStats().percent + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <text x="18" y="20.35" class="percentage">{{ weekStats().percent }}%</text>
+            </svg>
+          </div>
+          <div class="chart-info">
+            <h3>This Week</h3>
+            <span>{{ weekStats().completed }}/{{ weekStats().total }} tasks</span>
+          </div>
+        </div>
+
+        <!-- Monthly Chart -->
+        <div class="chart-card">
+          <div class="chart-container">
+            <svg viewBox="0 0 36 36" class="circular-chart chart-light">
+              <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path class="circle" [attr.stroke-dasharray]="monthStats().percent + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <text x="18" y="20.35" class="percentage">{{ monthStats().percent }}%</text>
+            </svg>
+          </div>
+          <div class="chart-info">
+            <h3>This Month</h3>
+            <span>{{ monthStats().completed }}/{{ monthStats().total }} tasks</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="actions">
       <a routerLink="/tasks" class="btn-primary">Go to Workspace ▶</a>
     </div>

@@ -2,6 +2,7 @@
 export interface Category {
   id: number;
   name: string;
+  user?: number; // Owner ID
 }
 
 export type TaskStatus = 'todo' | 'in_progress' | 'done';
@@ -12,5 +13,6 @@ export interface Task {
   description: string;
   status: TaskStatus;
   category?: number | Category; // ID или объект категории
+  deadline?: string;
   created_at?: string;
 }

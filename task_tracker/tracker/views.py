@@ -115,18 +115,20 @@ class TaskDetailView(APIView):
         return Response(status=204)
 
 
+from django.db.models import Q
+
 class CategoryListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        categories = Category.objects.all()
+        categories = Category.objects.filter(Q(user=request.user) | Q(user__isnull=True))
         serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data)
 
     def post(self, request):
         serializer = CategorySerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(user=request.user)
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
@@ -134,22 +136,22 @@ class CategoryListCreateView(APIView):
 class CategoryDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get_object(self, pk):
+    def get_object(self, pk, user):
         try:
-            return Category.objects.get(pk=pk)
+            return Category.objects.get(Q(pk=pk) & (Q(user=user) | Q(user__isnull=True)))
         except Category.DoesNotExist:
             return None
 
     def get(self, request, pk):
-        category = self.get_object(pk)
+        category = self.get_object(pk, request.user)
         if not category:
             return Response({'error': 'Not found'}, status=404)
         return Response(CategorySerializer(category).data)
 
     def put(self, request, pk):
-        category = self.get_object(pk)
-        if not category:
-            return Response({'error': 'Not found'}, status=404)
+        category = self.get_object(pk, request.user)
+        if not category or category.user != request.user:
+            return Response({'error': 'Permission denied or not found'}, status=403 if category else 404)
         serializer = CategorySerializer(category, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -157,9 +159,9 @@ class CategoryDetailView(APIView):
         return Response(serializer.errors, status=400)
 
     def delete(self, request, pk):
-        category = self.get_object(pk)
-        if not category:
-            return Response({'error': 'Not found'}, status=404)
+        category = self.get_object(pk, request.user)
+        if not category or category.user != request.user:
+            return Response({'error': 'Permission denied or not found'}, status=403 if category else 404)
         category.delete()
         return Response(status=204)
 

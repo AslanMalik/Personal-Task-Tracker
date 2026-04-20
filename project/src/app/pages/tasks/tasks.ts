@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaskService } from '../../services/task-service';
-import { Task } from '../../models/task';
+import { Task, Category } from '../../models/task';
 
 @Component({
   selector: 'app-tasks',
@@ -16,8 +16,11 @@ export class Tasks implements OnInit {
     title: '',
     category: undefined,
     status: 'todo',
-    description: ''
+    description: '',
+    deadline: ''
   };
+
+  newCategoryName = '';
 
   constructor(public taskService: TaskService) { }
 
@@ -34,7 +37,8 @@ export class Tasks implements OnInit {
           title: '',
           category: undefined,
           status: 'todo',
-          description: ''
+          description: '',
+          deadline: ''
         };
       },
       error: (err) => console.error('Ошибка создания:', err)
@@ -62,10 +66,19 @@ export class Tasks implements OnInit {
     }
   }
 
-  getCategoryName(cat: any): string {
-    if (!cat) return 'No Category';
-    if (typeof cat === 'object') return cat.name;
-    const found = this.taskService.categories().find(c => c.id === cat);
-    return found ? found.name : 'Category';
+  createCategory() {
+    if (!this.newCategoryName.trim()) return;
+    this.taskService.addCategory(this.newCategoryName).subscribe({
+      next: () => this.newCategoryName = '',
+      error: (err) => console.error('Ошибка создания категории:', err)
+    });
+  }
+
+  deleteCategory(id: number) {
+    if (confirm('Delete this category? Tasks using it will remain uncategorized.')) {
+      this.taskService.deleteCategory(id).subscribe({
+        error: (err) => console.error('Ошибка удаления категории:', err)
+      });
+    }
   }
 }

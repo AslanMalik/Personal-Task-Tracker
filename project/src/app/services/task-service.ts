@@ -13,7 +13,10 @@ export class TaskService {
   constructor(private http: HttpClient) { }
 
   private getHeaders() {
-    const token = localStorage.getItem('access');
+    let token = null;
+    if (typeof window !== 'undefined') {
+      token = localStorage.getItem('access');
+    }
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
@@ -68,5 +71,30 @@ export class TaskService {
         this.tasks.update(prev => prev.filter(t => t.id !== taskId));
       })
     );
+  }
+
+  addCategory(name: string): Observable<Category> {
+    const headers = this.getHeaders();
+    return this.http.post<Category>(`${this.apiUrl}/categories/`, { name }, { headers }).pipe(
+      tap(newCat => {
+        this.categories.update(prev => [...prev, newCat]);
+      })
+    );
+  }
+
+  deleteCategory(catId: number): Observable<any> {
+    const headers = this.getHeaders();
+    return this.http.delete(`${this.apiUrl}/categories/${catId}/`, { headers }).pipe(
+      tap(() => {
+        this.categories.update(prev => prev.filter(c => c.id !== catId));
+      })
+    );
+  }
+
+  getCategoryName(cat: any): string {
+    if (!cat) return 'No Category';
+    if (typeof cat === 'object') return cat.name;
+    const found = this.categories().find(c => c.id === cat);
+    return found ? found.name : 'Category';
   }
 }
