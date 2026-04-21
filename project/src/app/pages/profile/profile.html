@@ -6,10 +6,10 @@
     </header>
 
     <div class="profile-grid">
+
+      <!-- Info card -->
       <div class="card info-card">
-        <div class="avatar">
-          {{ username().charAt(0).toUpperCase() }}
-        </div>
+        <div class="avatar">{{ username().charAt(0).toUpperCase() }}</div>
         <div class="user-details">
           <h2>{{ username() }}</h2>
           <p class="email">{{ email() }}</p>
@@ -17,6 +17,7 @@
         </div>
       </div>
 
+      <!-- Stats -->
       <div class="stats-row">
         <div class="card stat-box dark">
           <span class="label">Total Tasks</span>
@@ -28,23 +29,88 @@
         </div>
       </div>
 
+      <!-- Account settings -->
       <div class="card actions-card">
         <h3>Account Settings</h3>
         <div class="action-list">
-          <button class="action-item">
+
+          <!-- ── Edit Profile ── -->
+          <button class="action-item" (click)="openPanel('edit')"
+            [class.action-active]="activePanel() === 'edit'">
             <span>Edit Profile</span>
-            <i class="arrow">▶</i>
+            <i class="arrow" [class.arrow-open]="activePanel() === 'edit'">▶</i>
           </button>
-          <button class="action-item">
+
+          @if (activePanel() === 'edit') {
+            <div class="panel">
+              <div class="field">
+                <label>Username</label>
+                <input type="text" [(ngModel)]="editUsername" placeholder="New username" />
+              </div>
+              <div class="field">
+                <label>Email</label>
+                <input type="email" [(ngModel)]="editEmail" placeholder="New email" />
+              </div>
+              @if (editError()) {
+                <p class="msg msg-error">{{ editError() }}</p>
+              }
+              @if (editSuccess()) {
+                <p class="msg msg-success">{{ editSuccess() }}</p>
+              }
+              <div class="panel-actions">
+                <button class="btn-save" (click)="saveProfile()" [disabled]="editLoading()">
+                  {{ editLoading() ? 'Saving…' : 'Save Changes' }}
+                </button>
+                <button class="btn-cancel" (click)="openPanel('edit')">Cancel</button>
+              </div>
+            </div>
+          }
+
+          <!-- ── Change Password ── -->
+          <button class="action-item" (click)="openPanel('password')"
+            [class.action-active]="activePanel() === 'password'">
             <span>Change Password</span>
-            <i class="arrow">▶</i>
+            <i class="arrow" [class.arrow-open]="activePanel() === 'password'">▶</i>
           </button>
+
+          @if (activePanel() === 'password') {
+            <div class="panel">
+              <div class="field">
+                <label>Current Password</label>
+                <input type="password" [(ngModel)]="oldPassword" placeholder="••••••••" />
+              </div>
+              <div class="field">
+                <label>New Password</label>
+                <input type="password" [(ngModel)]="newPassword" placeholder="••••••••" />
+              </div>
+              <div class="field">
+                <label>Confirm New Password</label>
+                <input type="password" [(ngModel)]="newPassword2" placeholder="••••••••" />
+              </div>
+              @if (pwError()) {
+                <p class="msg msg-error">{{ pwError() }}</p>
+              }
+              @if (pwSuccess()) {
+                <p class="msg msg-success">{{ pwSuccess() }}</p>
+              }
+              <div class="panel-actions">
+                <button class="btn-save" (click)="savePassword()" [disabled]="pwLoading()">
+                  {{ pwLoading() ? 'Saving…' : 'Change Password' }}
+                </button>
+                <button class="btn-cancel" (click)="openPanel('password')">Cancel</button>
+              </div>
+            </div>
+          }
+
+          <!-- ── Logout ── -->
           <button class="action-item logout-trigger" (click)="logout()">
             <span>Logout from account</span>
             <i class="arrow">▶</i>
           </button>
+
         </div>
       </div>
+
     </div>
   </div>
 </div>

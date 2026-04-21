@@ -107,4 +107,110 @@
 .logout-trigger { color: #ff4757; }
 .logout-trigger:hover { color: #ff2e44; }
 
-.arrow { font-style: normal; font-weight: 700; opacity: 0.3; }
+.arrow {
+  font-style: normal;
+  font-weight: 700;
+  opacity: 0.3;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.arrow-open {
+  transform: rotate(90deg);
+  opacity: 0.7;
+}
+.action-active {
+  color: #000;
+  padding-left: 10px;
+}
+
+/* ── Expand panel ── */
+.panel {
+  padding: 20px 4px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: slideDown 0.2s ease;
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+.field input {
+  padding: 11px 16px;
+  border-radius: 12px;
+  border: 1.5px solid #e8e8e8;
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+  background: #fafafa;
+  color: #1a1a1a;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.field input:focus {
+  border-color: #e8c444;
+  background: #fff;
+}
+
+/* Messages */
+.msg {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin: 0;
+}
+.msg-error   { background: rgba(231, 76, 60, 0.08);  color: #c0392b; }
+.msg-success { background: rgba(39, 174, 96, 0.10);  color: #1e7a3e; }
+
+/* Panel buttons */
+.panel-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+.btn-save {
+  padding: 11px 24px;
+  background: #1e1e1e;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+.btn-save:hover:not(:disabled) {
+  background: #000;
+  transform: translateY(-1px);
+}
+.btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-cancel {
+  padding: 11px 20px;
+  background: transparent;
+  color: #888;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.btn-cancel:hover {
+  color: #555;
+  border-color: #ccc;
+}
