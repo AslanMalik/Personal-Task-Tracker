@@ -96,7 +96,7 @@
         <ul class="task-list">
           @for (t of todayTasks(); track t.id) {
             <li class="task-row" [class.task-done]="t.status === 'done'">
-              <span class="task-check" [class.check-done]="t.status === 'done'">
+              <span class="task-check" [class.check-done]="t.status === 'done'" (click)="toggleTaskStatus(t)" style="cursor: pointer;" title="Toggle status">
                 @if (t.status === 'done') { ✓ } @else { &nbsp; }
               </span>
               <span class="task-name">{{ t.title }}</span>

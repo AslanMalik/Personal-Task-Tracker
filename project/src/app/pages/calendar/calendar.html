@@ -31,6 +31,9 @@
                 <div class="task-item" [attr.data-status]="task.status" [title]="task.title">
                   <span class="task-dot"></span>
                   <span class="task-title">{{ task.title }}</span>
+                  @if (task.deadline) {
+                    <span class="task-time">{{ formatTime(task.deadline) }}</span>
+                  }
                 </div>
               }
             </div>
