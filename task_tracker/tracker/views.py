@@ -166,6 +166,77 @@ class CategoryDetailView(APIView):
         return Response(status=204)
 
 
+class DashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        from django.utils import timezone
+        from datetime import timedelta
+
+        user  = request.user
+        tasks = Task.objects.filter(user=user)
+
+        total       = tasks.count()
+        completed   = tasks.filter(status='done').count()
+        in_progress = tasks.filter(status='in_progress').count()
+        todo        = tasks.filter(status='todo').count()
+        rate        = round(completed / total * 100) if total else 0
+
+        # Weekly chart — tasks created each of last 7 days
+        today      = timezone.now().date()
+        week_chart = []
+        for i in range(6, -1, -1):
+            day       = today - timedelta(days=i)
+            day_tasks = tasks.filter(created_at__date=day)
+            week_chart.append({
+                'day':       day.strftime('%a'),
+                'total':     day_tasks.count(),
+                'completed': day_tasks.filter(status='done').count(),
+                'is_today':  i == 0,
+            })
+
+        # Today's tasks (deadline today or no deadline, not done, up to 8)
+        today_tasks = list(tasks.filter(
+            deadline__date=today, status__in=['todo', 'in_progress']
+        )[:4]) + list(tasks.filter(status='done')[:4])
+        today_tasks = today_tasks[:8]
+
+        # Upcoming deadlines
+        upcoming = tasks.filter(
+            deadline__gte=timezone.now(),
+            status__in=['todo', 'in_progress']
+        ).order_by('deadline')[:5]
+
+        def fmt_task(t):
+            return {
+                'id':       t.id,
+                'title':    t.title,
+                'status':   t.status,
+                'deadline': t.deadline.isoformat() if t.deadline else None,
+                'category': t.category.name if t.category else None,
+            }
+
+        initials = (user.username[:2]).upper()
+
+        return Response({
+            'profile': {
+                'username': user.username,
+                'email':    user.email,
+                'initials': initials,
+            },
+            'stats': {
+                'total':       total,
+                'completed':   completed,
+                'in_progress': in_progress,
+                'todo':        todo,
+                'rate':        rate,
+            },
+            'week_chart':   week_chart,
+            'today_tasks':  [fmt_task(t) for t in today_tasks],
+            'upcoming':     [fmt_task(t) for t in upcoming],
+        })
+
+
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def task_comments_view(request, pk):

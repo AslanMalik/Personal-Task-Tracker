@@ -1,123 +1,142 @@
-<div class="dashboard-page">
-  <div class="container">
-    <header class="header">
-      <h1>Hello, {{ username() }}!</h1>
-      <p>What are your tasks for today?</p>
-    </header>
+<div class="db-page">
 
-    <div class="stats-grid">
-      <div class="stat-card dark">
-        <h2>{{ totalTasks() }}</h2>
-        <p>Total tasks</p>
-        <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+  @if (loading()) {
+    <div class="db-loading">
+      <div class="spinner"></div>
+      <p>Loading dashboard…</p>
+    </div>
+  } @else if (error()) {
+    <div class="db-error">{{ error() }}</div>
+  } @else {
+
+  <div class="bento">
+
+    <!-- ── Profile Card ── -->
+    <div class="card card-dark card-profile">
+      <div class="avatar">{{ profile()?.initials }}</div>
+      <div class="profile-info">
+        <h2>{{ profile()?.username }}</h2>
+        <p>{{ profile()?.email }}</p>
       </div>
+      <div class="profile-chips">
+        <span class="chip chip-light">{{ stats()?.total }} tasks</span>
+        <span class="chip chip-yellow">{{ stats()?.rate }}% done</span>
+      </div>
+      <a routerLink="/tasks" class="profile-cta">Open Workspace →</a>
+    </div>
 
-      <div class="stat-card yellow">
-        <h2>{{ completedTasks() }}</h2>
-        <p>Completed</p>
-        <div class="progress-bar">
-          <div class="fill dark-fill" [style.width.%]="totalTasks() ? (completedTasks() / totalTasks()) * 100 : 0"></div>
+    <!-- ── Stats Row ── -->
+    <div class="card card-yellow card-stats">
+      <p class="card-label">Overview</p>
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-num">{{ stats()?.total }}</span>
+          <span class="stat-lbl">Total</span>
         </div>
-      </div>
-
-      <div class="stat-card light">
-        <h2>{{ inProgressTasks() }}</h2>
-        <p>In progress</p>
-        <div class="progress-bar">
-          <div class="fill dark-fill" [style.width.%]="totalTasks() ? (inProgressTasks() / totalTasks()) * 100 : 0"></div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num">{{ stats()?.completed }}</span>
+          <span class="stat-lbl">Done</span>
         </div>
-      </div>
-
-      <div class="stat-card light">
-        <h2>{{ todoTasks() }}</h2>
-        <p>Upcoming / To Do</p>
-        <div class="progress-bar">
-          <div class="fill dark-fill" [style.width.%]="totalTasks() ? (todoTasks() / totalTasks()) * 100 : 0"></div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num">{{ stats()?.in_progress }}</span>
+          <span class="stat-lbl">In Progress</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num">{{ stats()?.todo }}</span>
+          <span class="stat-lbl">To Do</span>
         </div>
       </div>
     </div>
 
-    <div class="upcoming-section">
-      <div class="section-header">
-        <h2>Upcoming Deadlines</h2>
-        <p>Don't miss these important tasks</p>
-      </div>
-
-      <div class="upcoming-list">
-        @for (task of upcomingTasks(); track task.id) {
-          <div class="upcoming-item">
-            <div class="item-main">
-              <h3>{{ task.title }}</h3>
-              <span class="item-cat">{{ taskService.getCategoryName(task.category) }}</span>
+    <!-- ── Weekly Bar Chart ── -->
+    <div class="card card-light card-chart">
+      <p class="card-label">Activity this week</p>
+      <div class="bar-chart">
+        @for (day of weekChart(); track day.day) {
+          <div class="bar-col" [class.bar-today]="day.is_today">
+            <div class="bar-wrap">
+              <div class="bar-fill bar-total" [style.height.%]="barHeight(day.total)"></div>
+              <div class="bar-fill bar-done"  [style.height.%]="barHeight(day.completed)"></div>
             </div>
-            <div class="item-date">
-              <span class="date-badge">{{ task.deadline | date:'MMM d, HH:mm' }}</span>
-            </div>
-          </div>
-        } @empty {
-          <div class="empty-upcoming">
-            <p>No upcoming deadlines. Great job!</p>
+            <span class="bar-label">{{ day.day }}</span>
           </div>
         }
       </div>
-    </div>
-
-    <div class="analytics-section">
-      <div class="section-header">
-        <h2>Analytics</h2>
-        <p>Performance by time period</p>
-      </div>
-      
-      <div class="charts-grid">
-        <!-- Daily Chart -->
-        <div class="chart-card">
-          <div class="chart-container">
-            <svg viewBox="0 0 36 36" class="circular-chart chart-yellow">
-              <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <path class="circle" [attr.stroke-dasharray]="dayStats().percent + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <text x="18" y="20.35" class="percentage">{{ dayStats().percent }}%</text>
-            </svg>
-          </div>
-          <div class="chart-info">
-            <h3>Today</h3>
-            <span>{{ dayStats().completed }}/{{ dayStats().total }} tasks</span>
-          </div>
-        </div>
-
-        <!-- Weekly Chart -->
-        <div class="chart-card">
-          <div class="chart-container">
-            <svg viewBox="0 0 36 36" class="circular-chart chart-dark">
-              <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <path class="circle" [attr.stroke-dasharray]="weekStats().percent + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <text x="18" y="20.35" class="percentage">{{ weekStats().percent }}%</text>
-            </svg>
-          </div>
-          <div class="chart-info">
-            <h3>This Week</h3>
-            <span>{{ weekStats().completed }}/{{ weekStats().total }} tasks</span>
-          </div>
-        </div>
-
-        <!-- Monthly Chart -->
-        <div class="chart-card">
-          <div class="chart-container">
-            <svg viewBox="0 0 36 36" class="circular-chart chart-light">
-              <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <path class="circle" [attr.stroke-dasharray]="monthStats().percent + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <text x="18" y="20.35" class="percentage">{{ monthStats().percent }}%</text>
-            </svg>
-          </div>
-          <div class="chart-info">
-            <h3>This Month</h3>
-            <span>{{ monthStats().completed }}/{{ monthStats().total }} tasks</span>
-          </div>
-        </div>
+      <div class="chart-legend">
+        <span class="legend-dot dot-total"></span><span>Created</span>
+        <span class="legend-dot dot-done"></span><span>Completed</span>
       </div>
     </div>
 
-    <div class="actions">
-      <a routerLink="/tasks" class="btn-primary">Go to Workspace ▶</a>
+    <!-- ── Completion Ring ── -->
+    <div class="card card-dark card-ring">
+      <p class="card-label card-label-light">Completion rate</p>
+      <div class="ring-wrap">
+        <svg viewBox="0 0 36 36" class="ring-svg">
+          <path class="ring-bg"
+            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+          <path class="ring-fill"
+            [attr.stroke-dasharray]="(stats()?.rate ?? 0) + ', 100'"
+            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+          <text x="18" y="20.35" class="ring-pct">{{ stats()?.rate }}%</text>
+        </svg>
+      </div>
+      <p class="ring-sub">{{ stats()?.completed }}/{{ stats()?.total }} tasks completed</p>
     </div>
-  </div>
+
+    <!-- ── Today's Tasks ── -->
+    <div class="card card-light card-today">
+      <p class="card-label">Today's tasks</p>
+      @if (todayTasks().length === 0) {
+        <p class="empty-msg">No tasks for today 🎉</p>
+      } @else {
+        <ul class="task-list">
+          @for (t of todayTasks(); track t.id) {
+            <li class="task-row" [class.task-done]="t.status === 'done'">
+              <span class="task-check" [class.check-done]="t.status === 'done'">
+                @if (t.status === 'done') { ✓ } @else { &nbsp; }
+              </span>
+              <span class="task-name">{{ t.title }}</span>
+              @if (t.category) {
+                <span class="task-cat">{{ t.category }}</span>
+              }
+              <span class="task-status" [class]="'ts-' + t.status">{{ statusLabel(t.status) }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <!-- ── Upcoming Deadlines ── -->
+    <div class="card card-cream card-upcoming">
+      <p class="card-label">Upcoming deadlines</p>
+      @if (upcoming().length === 0) {
+        <p class="empty-msg">No upcoming deadlines</p>
+      } @else {
+        <ul class="upcoming-list">
+          @for (t of upcoming(); track t.id) {
+            <li class="upcoming-row">
+              <div class="up-info">
+                <span class="up-title">{{ t.title }}</span>
+                @if (t.category) {
+                  <span class="up-cat">{{ t.category }}</span>
+                }
+              </div>
+              <div class="up-date">
+                <span class="up-days" [class.up-urgent]="daysUntil(t.deadline) === 'Today' || daysUntil(t.deadline) === 'Tomorrow'">
+                  {{ daysUntil(t.deadline) }}
+                </span>
+                <span class="up-fmt">{{ formatDeadline(t.deadline) }}</span>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+  </div><!-- /bento -->
+  }<!-- /else -->
 </div>
