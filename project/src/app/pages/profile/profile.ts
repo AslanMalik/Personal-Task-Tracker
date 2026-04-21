@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { TaskService } from '../../services/task-service';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-profile',
@@ -17,6 +18,7 @@ export class Profile implements OnInit {
   private platformId = inject(PLATFORM_ID);
   private http       = inject(HttpClient);
   public  taskService = inject(TaskService);
+  private authService = inject(Auth);
 
   private apiUrl = 'http://127.0.0.1:8000/api';
 
@@ -145,8 +147,20 @@ export class Profile implements OnInit {
 
   logout() {
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.clear();
-      this.router.navigate(['/login']);
+      const refresh = localStorage.getItem('refresh');
+      if (refresh) {
+        this.authService.logout(refresh).subscribe({
+          next: () => this.finalizeLogout(),
+          error: () => this.finalizeLogout() // Still logout locally if API fails
+        });
+      } else {
+        this.finalizeLogout();
+      }
     }
+  }
+
+  private finalizeLogout() {
+    localStorage.clear();
+    this.router.navigate(['/login']);
   }
 }
