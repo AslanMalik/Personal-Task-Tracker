@@ -51,7 +51,17 @@
           
           <div class="task-content">
             <div class="task-header">
-              <h3>{{ task.title }}</h3>
+              <div style="flex: 1; display: flex; flex-direction: column;">
+                <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">{{ task.title }}</h3>
+                @if (task.subtasks && task.subtasks.length > 0) {
+                  <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
+                    <div class="progress-bar-container" style="flex: 1; max-width: 200px; height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden;">
+                      <div class="progress-bar-fill" [style.width]="getProgressPercent(task) + '%'" style="height: 100%; background: #4caf50; transition: width 0.3s ease;"></div>
+                    </div>
+                    <span class="subtask-progress" style="font-size: 12px; color: #888; font-weight: normal; white-space: nowrap;">{{ getProgress(task) }}</span>
+                  </div>
+                }
+              </div>
               @if (task.category) {
                 <span class="category-badge">{{ taskService.getCategoryName(task.category) }}</span>
               }
@@ -60,6 +70,27 @@
               }
             </div>
             <p class="description">{{ task.description || 'No description provided' }}</p>
+
+            <!-- Subtasks Section -->
+            <div class="subtasks-section" style="margin-top: 15px; background: rgba(0,0,0,0.02); padding: 10px; border-radius: 8px;">
+              <h4 style="margin: 0 0 10px; font-size: 13px; color: #666; text-transform: uppercase; letter-spacing: 0.05em;">Subtasks</h4>
+              @if (task.subtasks && task.subtasks.length > 0) {
+                <ul class="subtask-list" style="list-style: none; padding: 0; margin: 0 0 10px; display: flex; flex-direction: column; gap: 6px;">
+                  @for (st of task.subtasks; track st.id) {
+                    <li class="subtask-item" style="display: flex; align-items: center; gap: 8px; font-size: 14px;" [style.opacity]="st.is_completed ? '0.6' : '1'">
+                      <input type="checkbox" [checked]="st.is_completed" (change)="toggleSubTask(task, st, $event)">
+                      <span class="st-title" style="flex: 1;" [style.textDecoration]="st.is_completed ? 'line-through' : 'none'">{{ st.title }}</span>
+                      <button class="del-st-btn" (click)="deleteSubTask(task, st)" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 16px;">&times;</button>
+                    </li>
+                  }
+                </ul>
+              }
+              <div class="add-subtask" style="display: flex; gap: 8px;">
+                <input type="text" [(ngModel)]="newSubTaskTitle[task.id!]" placeholder="Add subtask..." (keyup.enter)="addSubTask(task)" style="flex: 1; padding: 6px 10px; font-size: 13px; border: 1px solid #ddd; border-radius: 6px;">
+                <button (click)="addSubTask(task)" [disabled]="!newSubTaskTitle[task.id!]" style="padding: 6px 12px; font-size: 13px; border: none; border-radius: 6px; cursor: pointer; background: #e8c444;">+</button>
+              </div>
+            </div>
+
           </div>
 
           <div class="actions" style="display: flex; gap: 10px; align-items: center;">

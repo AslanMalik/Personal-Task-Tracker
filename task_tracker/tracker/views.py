@@ -79,6 +79,23 @@ class TaskListCreateView(APIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
+def update_user_gamification(user, old_status, new_status):
+    from .models import UserProfile
+    from django.utils import timezone
+    from datetime import timedelta
+    if old_status != 'done' and new_status == 'done':
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+        today = timezone.now().date()
+        if profile.last_completed_date == today:
+            pass
+        elif profile.last_completed_date == today - timedelta(days=1):
+            profile.current_streak += 1
+        else:
+            profile.current_streak = 1
+        profile.total_tasks_completed += 1
+        profile.last_completed_date = today
+        profile.save()
+
 class TaskDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -99,10 +116,12 @@ class TaskDetailView(APIView):
         task = self.get_object(pk, request.user)
         if not task:
             return Response({'error': 'Not found'}, status=404)
+        old_status = task.status
         serializer = TaskSerializer(task, data=request.data)
 
         if serializer.is_valid():
             serializer.save()
+            update_user_gamification(request.user, old_status, serializer.validated_data.get('status', old_status))
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
 
@@ -110,10 +129,13 @@ class TaskDetailView(APIView):
         task = self.get_object(pk, request.user)
         if not task:
             return Response({'error': 'Not found'}, status=404)
+        old_status = task.status
         serializer = TaskSerializer(task, data=request.data, partial=True)
 
         if serializer.is_valid():
             serializer.save()
+            new_status = serializer.validated_data.get('status', old_status)
+            update_user_gamification(request.user, old_status, new_status)
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
 
@@ -125,6 +147,69 @@ class TaskDetailView(APIView):
         task.delete()
         return Response(status=204)
 
+from .models import SubTask
+from .serializers import SubTaskSerializer
+
+class SubTaskListCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, task_pk):
+        try:
+            task = Task.objects.get(pk=task_pk, user=request.user)
+        except Task.DoesNotExist:
+            return Response({'error': 'Task not found'}, status=404)
+
+        serializer = SubTaskSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(task=task)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+class SubTaskDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, pk, user):
+        try:
+            return SubTask.objects.get(pk=pk, task__user=user)
+        except SubTask.DoesNotExist:
+            return None
+
+    def patch(self, request, pk):
+        subtask = self.get_object(pk, request.user)
+        if not subtask:
+            return Response({'error': 'Not found'}, status=404)
+        serializer = SubTaskSerializer(subtask, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            
+            task = subtask.task
+            total_subtasks = task.subtasks.count()
+            if total_subtasks > 0:
+                completed_count = task.subtasks.filter(is_completed=True).count()
+                old_status = task.status
+                new_status = old_status
+
+                if completed_count == total_subtasks:
+                    new_status = 'done'
+                elif completed_count > 0:
+                    new_status = 'in_progress'
+                else:
+                    new_status = 'todo'
+
+                if new_status != old_status:
+                    task.status = new_status
+                    task.save()
+                    update_user_gamification(request.user, old_status, new_status)
+            
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        subtask = self.get_object(pk, request.user)
+        if not subtask:
+            return Response({'error': 'Not found'}, status=404)
+        subtask.delete()
+        return Response(status=204)
 
 from django.db.models import Q
 
@@ -229,11 +314,16 @@ class DashboardView(APIView):
 
         initials = (user.username[:2]).upper()
 
+        from .models import UserProfile
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+        current_streak = profile.current_streak
+
         return Response({
             'profile': {
                 'username': user.username,
                 'email':    user.email,
                 'initials': initials,
+                'current_streak': current_streak,
             },
             'stats': {
                 'total':       total,

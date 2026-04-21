@@ -21,6 +21,9 @@
       <div class="profile-chips">
         <span class="chip chip-light">{{ stats()?.total }} tasks</span>
         <span class="chip chip-yellow">{{ stats()?.rate }}% done</span>
+        @if (profile()?.current_streak) {
+          <span class="chip chip-fire">🔥 {{ profile()?.current_streak }} day streak</span>
+        }
       </div>
       <a routerLink="/tasks" class="profile-cta">Open Workspace →</a>
     </div>

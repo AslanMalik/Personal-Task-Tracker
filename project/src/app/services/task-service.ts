@@ -73,6 +73,70 @@ export class TaskService {
     );
   }
 
+  addSubTask(taskId: number, title: string): Observable<any> {
+    const headers = this.getHeaders();
+    return this.http.post(`${this.apiUrl}/tasks/${taskId}/subtasks/`, { title }, { headers }).pipe(
+      tap((newSt: any) => {
+        this.tasks.update(tasks => {
+          const taskObj = tasks.find(t => t.id === taskId);
+          if (taskObj) {
+            taskObj.subtasks = taskObj.subtasks || [];
+            taskObj.subtasks.push(newSt);
+          }
+          return [...tasks];
+        });
+      })
+    );
+  }
+
+  toggleSubTask(subtaskId: number, is_completed: boolean): Observable<any> {
+    const headers = this.getHeaders();
+    return this.http.patch(`${this.apiUrl}/subtasks/${subtaskId}/`, { is_completed }, { headers }).pipe(
+      tap((updatedSt: any) => {
+        this.tasks.update(tasks => {
+          for (const t of tasks) {
+            if (t.subtasks) {
+              const idx = t.subtasks.findIndex(s => s.id === subtaskId);
+              if (idx > -1) {
+                t.subtasks[idx] = updatedSt;
+                
+                const total = t.subtasks.length;
+                const completed = t.subtasks.filter(s => s.is_completed).length;
+
+                if (total > 0) {
+                  if (completed === total) {
+                    t.status = 'done';
+                  } else if (completed > 0) {
+                    t.status = 'in_progress';
+                  } else {
+                    t.status = 'todo';
+                  }
+                }
+              }
+            }
+          }
+          return [...tasks];
+        });
+      })
+    );
+  }
+
+  deleteSubTask(subtaskId: number): Observable<any> {
+    const headers = this.getHeaders();
+    return this.http.delete(`${this.apiUrl}/subtasks/${subtaskId}/`, { headers }).pipe(
+      tap(() => {
+        this.tasks.update(tasks => {
+          for (const t of tasks) {
+            if (t.subtasks) {
+              t.subtasks = t.subtasks.filter(s => s.id !== subtaskId);
+            }
+          }
+          return [...tasks];
+        });
+      })
+    );
+  }
+
   addCategory(name: string): Observable<Category> {
     const headers = this.getHeaders();
     return this.http.post<Category>(`${this.apiUrl}/categories/`, { name }, { headers }).pipe(

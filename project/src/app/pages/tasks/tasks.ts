@@ -21,6 +21,7 @@ export class Tasks implements OnInit {
   };
 
   newCategoryName = '';
+  newSubTaskTitle: { [taskId: number]: string } = {};
 
   constructor(public taskService: TaskService) { }
 
@@ -64,6 +65,39 @@ export class Tasks implements OnInit {
         error: (err) => console.error('Ошибка удаления:', err)
       });
     }
+  }
+
+  addSubTask(task: Task) {
+    if (!task.id) return;
+    const title = this.newSubTaskTitle[task.id];
+    if (!title?.trim()) return;
+    
+    this.taskService.addSubTask(task.id, title).subscribe(() => {
+      this.newSubTaskTitle[task.id!] = '';
+    });
+  }
+
+  toggleSubTask(task: Task, subtask: any, event: any) {
+    const isCompleted = event.target.checked;
+    this.taskService.toggleSubTask(subtask.id, isCompleted).subscribe();
+  }
+
+  deleteSubTask(task: Task, subtask: any) {
+    if (confirm('Delete subtask?')) {
+      this.taskService.deleteSubTask(subtask.id).subscribe();
+    }
+  }
+
+  getProgress(task: Task): string {
+    if (!task.subtasks || task.subtasks.length === 0) return '';
+    const completed = task.subtasks.filter(s => s.is_completed).length;
+    return `(${completed}/${task.subtasks.length})`;
+  }
+
+  getProgressPercent(task: Task): number {
+    if (!task.subtasks || task.subtasks.length === 0) return 0;
+    const completed = task.subtasks.filter(s => s.is_completed).length;
+    return (completed / task.subtasks.length) * 100;
   }
 
   createCategory() {

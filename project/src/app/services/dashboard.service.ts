@@ -6,6 +6,7 @@ export interface DashboardProfile {
   username: string;
   email: string;
   initials: string;
+  current_streak?: number;
 }
 
 export interface DashboardStats {

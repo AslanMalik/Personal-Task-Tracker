@@ -11,4 +11,6 @@ urlpatterns = [
     path('categories/', views.CategoryListCreateView.as_view()),
     path('categories/<int:pk>/', views.CategoryDetailView.as_view()),
     path('dashboard-data/', views.DashboardView.as_view()),
+    path('tasks/<int:task_pk>/subtasks/', views.SubTaskListCreateView.as_view()),
+    path('subtasks/<int:pk>/', views.SubTaskDetailView.as_view()),
 ]
