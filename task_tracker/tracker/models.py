@@ -7,7 +7,7 @@ class User(AbstractUser):
 
 class Category(models.Model):
   name = models.CharField(max_length=100)
-  user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="categories", null=True, blank=True)
+  user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="categories", null=True, blank=True) # связь многие-к-одному, удалили юзера → все его категории тоже удалятся, через user.categories.all() получишь все категории юзера, поле необязательное (категория может быть без юзера)
   created_at = models.DateTimeField(auto_now_add=True)
 
   def __str__(self):
