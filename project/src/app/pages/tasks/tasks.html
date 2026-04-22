@@ -5,6 +5,13 @@
       <p>Manage your tasks and categories</p>
     </header>
 
+    @if (errorMessage()) {
+      <div class="error-banner">
+        {{ errorMessage() }}
+        <button class="close-error" (click)="errorMessage.set('')">&times;</button>
+      </div>
+    }
+
     <div class="create-card">
       <div class="input-row">
         <input type="text" [(ngModel)]="newTask.title" placeholder="Task title (required)" style="flex: 2;"/>
@@ -49,57 +56,66 @@
         <div class="task-card" [class.done]="task.status === 'done'">
           <div class="status-indicator" [attr.data-status]="task.status"></div>
           
+          <button class="delete-corner" (click)="deleteTask(task.id!)" title="Delete task">&times;</button>
+
           <div class="task-content">
             <div class="task-header">
-              <div style="flex: 1; display: flex; flex-direction: column;">
-                <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">{{ task.title }}</h3>
-                @if (task.subtasks && task.subtasks.length > 0) {
-                  <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
-                    <div class="progress-bar-container" style="flex: 1; max-width: 200px; height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden;">
-                      <div class="progress-bar-fill" [style.width]="getProgressPercent(task) + '%'" style="height: 100%; background: #4caf50; transition: width 0.3s ease;"></div>
-                    </div>
-                    <span class="subtask-progress" style="font-size: 12px; color: #888; font-weight: normal; white-space: nowrap;">{{ getProgress(task) }}</span>
-                  </div>
-                }
+              <div class="task-title-group">
+                <div class="title-row">
+                  <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">{{ task.title }}</h3>
+                  <button class="edit-btn-inline" (click)="startEdit(task)" style="background: none; border: none; padding: 0; cursor: pointer; opacity: 0.5;">✏️</button>
+                </div>
+                
+                <div class="badges-row">
+                  @if (task.category) {
+                    <span class="category-badge">{{ taskService.getCategoryName(task.category) }}</span>
+                  }
+                  @if (task.deadline) {
+                    <span class="deadline-badge">📅 {{ task.deadline | date:'short' }}</span>
+                  }
+                </div>
               </div>
-              @if (task.category) {
-                <span class="category-badge">{{ taskService.getCategoryName(task.category) }}</span>
-              }
-              @if (task.deadline) {
-                <span class="deadline-badge">📅 {{ task.deadline | date:'short' }}</span>
-              }
+
+              <div class="task-status-dropdown">
+                <select [ngModel]="task.status" (ngModelChange)="changeStatus(task, $event)">
+                  <option value="todo">To Do</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="done">Done</option>
+                </select>
+              </div>
             </div>
-            <p class="description">{{ task.description || 'No description provided' }}</p>
+
+            <div class="task-progress-desc">
+              @if (task.subtasks && task.subtasks.length > 0) {
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                  <div class="progress-bar-container" style="flex: 1; max-width: 200px; height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden;">
+                    <div class="progress-bar-fill" [style.width]="getProgressPercent(task) + '%'" style="height: 100%; background: #4caf50; transition: width 0.3s ease;"></div>
+                  </div>
+                  <span class="subtask-progress" style="font-size: 12px; color: #888; font-weight: normal; white-space: nowrap;">{{ getProgress(task) }}</span>
+                </div>
+              }
+              <p class="description">{{ task.description || 'No description provided' }}</p>
+            </div>
 
             <!-- Subtasks Section -->
-            <div class="subtasks-section" style="margin-top: 15px; background: rgba(0,0,0,0.02); padding: 10px; border-radius: 8px;">
-              <h4 style="margin: 0 0 10px; font-size: 13px; color: #666; text-transform: uppercase; letter-spacing: 0.05em;">Subtasks</h4>
+            <div class="subtasks-section" style="margin-top: 15px; background: rgba(0,0,0,0.02); padding: 12px 15px; border-radius: 12px;">
+              <h4 style="margin: 0 0 10px; font-size: 12px; color: #888; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Subtasks</h4>
               @if (task.subtasks && task.subtasks.length > 0) {
-                <ul class="subtask-list" style="list-style: none; padding: 0; margin: 0 0 10px; display: flex; flex-direction: column; gap: 6px;">
+                <ul class="subtask-list" style="list-style: none; padding: 0; margin: 0 0 10px; display: flex; flex-direction: column; gap: 8px;">
                   @for (st of task.subtasks; track st.id) {
-                    <li class="subtask-item" style="display: flex; align-items: center; gap: 8px; font-size: 14px;" [style.opacity]="st.is_completed ? '0.6' : '1'">
-                      <input type="checkbox" [checked]="st.is_completed" (change)="toggleSubTask(task, st, $event)">
+                    <li class="subtask-item" style="display: flex; align-items: center; gap: 10px; font-size: 14px; background: #fff; padding: 8px 12px; border-radius: 8px; border: 1px solid #efefef;" [style.opacity]="st.is_completed ? '0.6' : '1'">
+                      <input type="checkbox" [checked]="st.is_completed" (change)="toggleSubTask(task, st, $event)" style="accent-color: #fbd652; width: 16px; height: 16px;">
                       <span class="st-title" style="flex: 1;" [style.textDecoration]="st.is_completed ? 'line-through' : 'none'">{{ st.title }}</span>
-                      <button class="del-st-btn" (click)="deleteSubTask(task, st)" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 16px;">&times;</button>
+                      <button class="del-st-btn" (click)="deleteSubTask(task, st)" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 18px; padding: 0;">&times;</button>
                     </li>
                   }
                 </ul>
               }
               <div class="add-subtask" style="display: flex; gap: 8px;">
-                <input type="text" [(ngModel)]="newSubTaskTitle[task.id!]" placeholder="Add subtask..." (keyup.enter)="addSubTask(task)" style="flex: 1; padding: 6px 10px; font-size: 13px; border: 1px solid #ddd; border-radius: 6px;">
-                <button (click)="addSubTask(task)" [disabled]="!newSubTaskTitle[task.id!]" style="padding: 6px 12px; font-size: 13px; border: none; border-radius: 6px; cursor: pointer; background: #e8c444;">+</button>
+                <input type="text" [(ngModel)]="newSubTaskTitle[task.id!]" placeholder="Add subtask..." (keyup.enter)="addSubTask(task)" style="flex: 1; padding: 8px 12px; font-size: 13px; border: 1px solid #ddd; border-radius: 8px;">
+                <button (click)="addSubTask(task)" [disabled]="!newSubTaskTitle[task.id!]" style="padding: 8px 16px; font-size: 13px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; background: #e8c444;">+</button>
               </div>
             </div>
-
-          </div>
-
-          <div class="actions" style="display: flex; gap: 10px; align-items: center;">
-            <select [ngModel]="task.status" (ngModelChange)="changeStatus(task, $event)">
-              <option value="todo">To Do</option>
-              <option value="in_progress">In Progress</option>
-              <option value="done">Done</option>
-            </select>
-            <button class="delete-btn" (click)="deleteTask(task.id!)">Delete</button>
           </div>
         </div>
       } @empty {
@@ -107,4 +123,35 @@
       }
     </div>
   </div>
+
+  @if (editingTask()) {
+    <div class="edit-overlay">
+      <div class="edit-modal">
+        <h3>Edit Task</h3>
+        <div class="edit-form">
+          <label>Title</label>
+          <input type="text" [(ngModel)]="editingTask()!.title" />
+
+          <label>Description</label>
+          <textarea [(ngModel)]="editingTask()!.description" rows="3"></textarea>
+
+          <label>Category</label>
+          <select [(ngModel)]="editingTask()!.category">
+            <option [ngValue]="undefined">No Category</option>
+            @for (cat of taskService.categories(); track cat.id) {
+              <option [ngValue]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+
+          <label>Deadline</label>
+          <input type="datetime-local" [(ngModel)]="editingTask()!.deadline" />
+
+          <div class="edit-actions">
+            <button class="cancel-btn" (click)="cancelEdit()">Cancel</button>
+            <button class="save-btn" (click)="saveEdit()">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 </div>

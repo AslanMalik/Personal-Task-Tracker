@@ -12,28 +12,16 @@ export class TaskService {
 
   constructor(private http: HttpClient) { }
 
-  private getHeaders() {
-    let token = null;
-    if (typeof window !== 'undefined') {
-      token = localStorage.getItem('access');
-    }
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-  }
-
   loadInitialData() {
-    const headers = this.getHeaders();
-    this.http.get<Category[]>(`${this.apiUrl}/categories/`, { headers })
+    this.http.get<Category[]>(`${this.apiUrl}/categories/`)
       .subscribe(data => this.categories.set(data));
 
-    this.http.get<Task[]>(`${this.apiUrl}/tasks/`, { headers })
+    this.http.get<Task[]>(`${this.apiUrl}/tasks/`)
       .subscribe(data => this.tasks.set(data));
   }
 
   addTask(task: Partial<Task>): Observable<Task> {
-    const headers = this.getHeaders();
-    return this.http.post<Task>(`${this.apiUrl}/tasks/`, task, { headers }).pipe(
+    return this.http.post<Task>(`${this.apiUrl}/tasks/`, task).pipe(
       tap(newTask => {
         this.tasks.update(prev => [newTask, ...prev]);
       })
@@ -50,14 +38,12 @@ export class TaskService {
   // }
 
   updateTaskStatus(task: Task, newStatus: TaskStatus): Observable<Task> {
-    const headers = this.getHeaders();
-
     const payload = {
       ...task,
       status: newStatus
     };
 
-    return this.http.put<Task>(`${this.apiUrl}/tasks/${task.id}/`, payload, { headers }).pipe(
+    return this.http.put<Task>(`${this.apiUrl}/tasks/${task.id}/`, payload).pipe(
       tap(updated => {
         this.tasks.update(prev => prev.map(t => t.id === task.id ? updated : t));
       })
@@ -65,8 +51,7 @@ export class TaskService {
   }
 
   deleteTask(taskId: number): Observable<any> {
-    const headers = this.getHeaders();
-    return this.http.delete(`${this.apiUrl}/tasks/${taskId}/`, { headers }).pipe(
+    return this.http.delete(`${this.apiUrl}/tasks/${taskId}/`).pipe(
       tap(() => {
         this.tasks.update(prev => prev.filter(t => t.id !== taskId));
       })
@@ -74,8 +59,7 @@ export class TaskService {
   }
 
   addSubTask(taskId: number, title: string): Observable<any> {
-    const headers = this.getHeaders();
-    return this.http.post(`${this.apiUrl}/tasks/${taskId}/subtasks/`, { title }, { headers }).pipe(
+    return this.http.post(`${this.apiUrl}/tasks/${taskId}/subtasks/`, { title }).pipe(
       tap((newSt: any) => {
         this.tasks.update(tasks => {
           const taskObj = tasks.find(t => t.id === taskId);
@@ -90,8 +74,7 @@ export class TaskService {
   }
 
   toggleSubTask(subtaskId: number, is_completed: boolean): Observable<any> {
-    const headers = this.getHeaders();
-    return this.http.patch(`${this.apiUrl}/subtasks/${subtaskId}/`, { is_completed }, { headers }).pipe(
+    return this.http.patch(`${this.apiUrl}/subtasks/${subtaskId}/`, { is_completed }).pipe(
       tap((updatedSt: any) => {
         this.tasks.update(tasks => {
           for (const t of tasks) {
@@ -122,8 +105,7 @@ export class TaskService {
   }
 
   deleteSubTask(subtaskId: number): Observable<any> {
-    const headers = this.getHeaders();
-    return this.http.delete(`${this.apiUrl}/subtasks/${subtaskId}/`, { headers }).pipe(
+    return this.http.delete(`${this.apiUrl}/subtasks/${subtaskId}/`).pipe(
       tap(() => {
         this.tasks.update(tasks => {
           for (const t of tasks) {
@@ -138,8 +120,7 @@ export class TaskService {
   }
 
   addCategory(name: string): Observable<Category> {
-    const headers = this.getHeaders();
-    return this.http.post<Category>(`${this.apiUrl}/categories/`, { name }, { headers }).pipe(
+    return this.http.post<Category>(`${this.apiUrl}/categories/`, { name }).pipe(
       tap(newCat => {
         this.categories.update(prev => [...prev, newCat]);
       })
@@ -147,8 +128,7 @@ export class TaskService {
   }
 
   deleteCategory(catId: number): Observable<any> {
-    const headers = this.getHeaders();
-    return this.http.delete(`${this.apiUrl}/categories/${catId}/`, { headers }).pipe(
+    return this.http.delete(`${this.apiUrl}/categories/${catId}/`).pipe(
       tap(() => {
         this.categories.update(prev => prev.filter(c => c.id !== catId));
       })

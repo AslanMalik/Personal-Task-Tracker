@@ -3,9 +3,34 @@
 .task-page {
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
-  background: linear-gradient(135deg, #eef1f4 0%, #fdf5d7 100%);
-  padding: 60px 20px;
+  background: #fdfdfd;
+  padding-top: 40px;
+  padding-bottom: 60px;
+  padding-left: 20px;
+  padding-right: 20px;
   color: #1a1a1a;
+}
+
+.error-banner {
+  background: #fff5f5;
+  border-left: 4px solid #e53e3e;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  color: #c53030;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.close-error {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #c53030;
+  cursor: pointer;
+  padding: 0 5px;
 }
 
 .container {
@@ -92,6 +117,84 @@
   background: #fbd652;
 }
 
+/* Edit Modal Styles */
+.edit-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.edit-modal {
+  background: white;
+  width: 100%;
+  max-width: 500px;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.edit-modal h3 {
+  margin: 0 0 20px;
+  font-size: 20px;
+  color: #333;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.edit-form label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.edit-form input, 
+.edit-form select, 
+.edit-form textarea {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.cancel-btn {
+  padding: 10px 20px;
+  background: #f5f5f5;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.save-btn {
+  padding: 10px 20px;
+  background: #e8c444;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
 .status-indicator[data-status="done"] {
   background: #2ecc71;
 }
@@ -99,19 +202,51 @@
 .task-content {
   flex: 1;
   margin-left: 10px;
+  width: 100%;
 }
 
 .task-header {
   display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 15px;
+  flex-wrap: wrap;
+  padding-right: 25px; /* Prevent overlap with delete cross */
+}
+
+.task-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.title-row {
+  display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: nowrap; /* strict inline alignment */
+}
+.title-row h3 {
+  word-break: break-word;
+}
+
+
+.badges-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .category-badge {
   background: #f0f2f5;
   padding: 4px 8px;
   border-radius: 6px;
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #555;
 }
 
 .deadline-badge {
@@ -119,33 +254,51 @@
   color: #e65100;
   padding: 4px 8px;
   border-radius: 6px;
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
   display: flex;
   align-items: center;
   gap: 5px;
 }
 
-.actions select {
-  border: 1px solid #eee;
-  padding: 8px;
-  border-radius: 10px;
+.task-status-dropdown select {
+  border: 1px solid #ddd;
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.task-status-dropdown select:focus {
+  border-color: #fbd652;
 }
 
 .task-card.done {
-  opacity: 0.6;
+  opacity: 0.7;
 }
 
-/* .task-card.done h3 {
-  text-decoration: line-through;
-} */
-
-.delete-btn {
+.delete-corner {
+  position: absolute;
+  top: 15px;
+  right: 15px;
   background: none;
   border: none;
-  color: #ff4757;
+  color: #ff4757; /* Red by default */
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 24px;
+  line-height: 1;
+  opacity: 0.8; /* Always visible */
+  transition: all 0.2s;
+  padding: 5px;
+}
+
+.delete-corner:hover {
+  opacity: 1;
+  transform: scale(1.1);
 }
 
 .category-management {
